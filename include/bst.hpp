@@ -177,58 +177,182 @@ class BST {
 };
 
 template <class T>
-BST<T>::TreeNode::TreeNode(const T& value) {}
+BST<T>::TreeNode::TreeNode(const T& value) 
+  : data{value}, left{nullptr}, right{nullptr} {}
+
+
+template <class T> 
+BST<T>::TreeNode::~TreeNode() { //quando um nó for destruído, ele tbm destruirá os filhos 
+  delete left;
+  delete right;
+}
 
 template <class T>
-BST<T>::TreeNode::~TreeNode() {}
+typename BST<T>::TreeNode* BST<T>::TreeNode::max() { //serve para encontrar o maior valor da subárvore a partir de um nó
+ TreeNode* current = this;
+ while (current->right != nullptr){
+  current = current ->right;
+ }
+ return current;
+}
+template <class T>
+typename BST<T>::TreeNode* BST<T>::TreeNode::min() { //serve para encontrar o menor valor 
+   TreeNode* current = this;
+ while (current->left != nullptr){
+  current = current ->left;
+ }
+ return current;
+}
+
 
 template <class T>
-typename BST<T>::TreeNode* BST<T>::TreeNode::max() {}
+BST<T>::BST() : root{nullptr}{ //inicializa o ponteiro root como nullptr, a árvore começa vazia 
+
+}
 
 template <class T>
-typename BST<T>::TreeNode* BST<T>::TreeNode::min() {}
+BST<T>::~BST() { //destrutor
+  delete root;//root-> nó raiz, começo da árvore  
+}
 
 template <class T>
-BST<T>::BST() {}
+bool BST<T>::insert(const T& value) { //Chama a versão recursiva privada de insert, passando a raiz da árvore (root) por referência,  a árvore cresça a partir da raiz, mesmo se root for nullptr.
+  return insert(root, value);
+
+}
 
 template <class T>
-BST<T>::~BST() {}
+bool BST<T>::remove(const T& value) {
+  return remove(root, value); //é quem realmente vai procurar o valor e remover o nó correspondente, ajustando os ponteiros.
+}
 
 template <class T>
-bool BST<T>::insert(const T& value) {}
+bool BST<T>::contain(const T& value) const { //compara o valor ate chegar ao final da árvore 
+  return contain(root, value);
+}
 
 template <class T>
-bool BST<T>::remove(const T& value) {}
+bool BST<T>::insert(TreeNode*& node, const T& value) {
+  if (node == nullptr){
+    node = new TreeNode(value);
+    return true;
+  }
+
+  if (value < node->data)
+   return insert(node->left, value); //vai para a esquerda 
+  else if (node->data < value)
+   return insert(node->right, value); //vai para a direita 
+  else
+   return false; //valor já existe 
+}
 
 template <class T>
-bool BST<T>::contain(const T& value) const {}
+bool BST<T>::contain(const TreeNode* const node, const T& value) const {
+  if (node == nullptr) {
+    return false;
+  }
+
+  if (value < node->data){
+    return contain(node->left, value); //procura na subárvore da esquerda
+
+  } else if (node->data < value){
+    return contain(node->right, value); //procura na subárvore da direita 
+  }else{
+    return true;
+  }
+}
 
 template <class T>
-bool BST<T>::insert(TreeNode*& node, const T& value) {}
+bool BST<T>::remove(TreeNode*& node, const T& value) {
+   if (node == nullptr) {
+    return false; // valor não encontrado
+  }
 
-template <class T>
-bool BST<T>::contain(const TreeNode* const node, const T& value) const {}
+  if (value < node->data) {
+    return remove(node->left, value); // procurar à esquerda
+  } else if (node->data < value) {
+    return remove(node->right, value); // procurar à direita
+  } else {
+    // Achamos o nó que deve ser removido
 
-template <class T>
-bool BST<T>::remove(TreeNode*& node, const T& value) {}
+    // Caso 1: sem filhos (folha)
+    if (node->left == nullptr && node->right == nullptr) {
+      delete node;
+      node = nullptr;
+    }
+    // Caso 2: só tem filho à direita
+    else if (node->left == nullptr) {
+      TreeNode* temp = node;
+      node = node->right;
+      temp->right = nullptr;
+      delete temp;
+    }
+    // Caso 3: só tem filho à esquerda
+    else if (node->right == nullptr) {
+      TreeNode* temp = node;
+      node = node->left;
+      temp->left = nullptr;
+      delete temp;
+    }
+    // Caso 4: dois filhos
+    else {
+      TreeNode* successor = node->right->min(); // menor da subárvore direita
+      node->data = successor->data;             // copia o valor
+      remove(node->right, successor->data);     // remove o nó duplicado
+    }
+    return true;
+  }
+}
 
 template <class T>
 void BST<T>::in_order(const TreeNode* const node,
-                      std::vector<T>& result) const {}
+                      std::vector<T>& result) const {
+  if (node == nullptr) return; //se o ponteiro node for nulo(nao tem mais filhos) encerra essa chamada da função
+
+  in_order(node->left, result); //esquerda,  vai descendo ate encontrar o menor valor 
+  result.push_back(node->data); //atual, adiciona o valor do nó atual 
+  in_order(node->right, result); //direita, garante que os valores maiores viram depois 
+   }
 
 template <class T>
-std::vector<T> BST<T>::in_order() const {}
+std::vector<T> BST<T>::in_order() const {
+  std::vector<T> result;
+  in_order(root, result); //chama a função recursiva 
+  return result;
+}
 
-template <class T>
+template <class T> //visita o nó atual, visita a subárvore da esquerda, visita a subárvore da direita 
 void BST<T>::pre_order(const TreeNode* const node,
-                       std::vector<T>& result) const {}
+                       std::vector<T>& result) const {
+    if (node == nullptr) return;
+
+    result.push_back(node->data);
+    pre_order(node->left, result);
+    pre_order(node->right, result);
+    }
 
 template <class T>
-std::vector<T> BST<T>::pre_order() const {}
+std::vector<T> BST<T>::pre_order() const {
+  std::vector<T> result;
+  pre_order(root, result);
+  return result;
+}
 
 template <class T>
 void BST<T>::post_order(const TreeNode* const node,
-                        std::vector<T>& result) const {}
+                        std::vector<T>& result) const {
+
+  if (node == nullptr) return;
+
+  post_order(node->left, result);
+  post_order(node->right, result);
+  result.push_back(node->data);
+ }
 
 template <class T>
-std::vector<T> BST<T>::post_order() const {}
+std::vector<T> BST<T>::post_order() const {
+  std::vector<T> result;
+  post_order(root, result);
+  return result;
+}
+
