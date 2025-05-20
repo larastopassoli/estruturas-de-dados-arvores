@@ -12,3 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_executable(bst_test test/bst.cpp)
 target_link_libraries(bst_test gtest gtest_main)
 gtest_add_tests(TARGET bst_test)
+
+add_executable(avl_test test/avl.cpp)
+target_link_libraries(avl_test gtest gtest_main)
+gtest_add_tests(TARGET avl_test)
