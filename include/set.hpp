@@ -66,10 +66,16 @@ template <class T>
 Set<T>::Set() {}
 
 template <class T>
-bool Set<T>::insert(const T& value) {}
+bool Set<T>::insert(const T& value) {
+  return data.insert(value);
+}
 
 template <class T>
-bool Set<T>::remove(const T& value) {}
+bool Set<T>::remove(const T& value) {
+  return data.remove(value);
+}
 
 template <class T>
-bool Set<T>::search(const T& value) const {}
+bool Set<T>::search(const T& value) const {
+  return data.contain(value);
+}

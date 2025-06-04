@@ -1,5 +1,7 @@
 #pragma once
 #include "bst.hpp"
+#include<stdexcept>
+
 
 /**
  * @brief Classe que representa um Mapa Associativo (Map).
@@ -89,14 +91,44 @@ class Map {
   BST<Pair> data;  ///< A Árvore Binária que armazena os pares chave-valor.
 };
 
-template <class K, class V>
-Map<K, V>::Map() {}
+template <class K, class V>//construtor padrão
+Map<K, V>::Map() {
+
+}
 
 template <class K, class V>
-V& Map<K, V>::operator[](const K& key) {}
+V& Map<K, V>::operator[](const K& key) {
+   Pair busca(key);
+  typename BST<Pair>::TreeNode* node = data.find_node(busca);
+
+  if (node) {
+    return node->data.value;
+  }
+
+  // Se não existe, insere com valor padrão
+  busca.value = V();
+  data.insert(busca);
+
+  // Agora busca de novo para retornar a referência
+  return data.find_node(busca)->data.value;
+
+}
 
 template <class K, class V>
-const V& Map<K, V>::operator[](const K& key) const {}
+const V& Map<K, V>::operator[](const K& key) const {
+   Pair busca(key);
+  typename BST<Pair>::TreeNode* node = data.find_node(busca);
+
+  if (!node) {
+    throw std::out_of_range("Chave não encontrada no Map");
+  }
+
+  return node->data.value;
+
+}
 
 template <class K, class V>
-bool Map<K, V>::remove(const K& key) {}
+bool Map<K, V>::remove(const K& key) {
+  Pair busca(key);
+  return data.remove(busca);
+}
