@@ -88,7 +88,7 @@ class Map {
   bool remove(const K& key);
 
  private:
-  BST<Pair> data;  ///< A Árvore Binária que armazena os pares chave-valor.
+  BST<Pair> data;  
 };
 
 template <class K, class V>//construtor padrão
